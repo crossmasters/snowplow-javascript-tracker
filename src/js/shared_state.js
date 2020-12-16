@@ -35,7 +35,7 @@
 import forEach from 'lodash/forEach';
 import { addEventListener } from './lib/helpers';
 
-export function State() {
+export function SharedState() {
   var documentAlias = document,
     windowAlias = window,
     /* Contains four variables that are shared with tracker.js and must be passed by reference */

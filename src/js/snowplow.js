@@ -39,12 +39,12 @@
  */
 
 import { Tracker } from './tracker'
-import { State } from './state';
+import { SharedState } from './shared_state';
 import { version } from './version';
 
 export const Snowplow = (() => {
-    const trackerDictionary = [];
-    const state = new State();
+    const trackerDictionary = {};
+    const state = new SharedState();
 
     return {
         newTracker: (namespace, endpoint, argmap) => {

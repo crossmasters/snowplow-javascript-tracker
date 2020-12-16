@@ -1,12 +1,12 @@
 import { parallel } from 'gulp';
+import { iife, esm, cjs } from './build';
 import { pullSnowplowMicro, buildTestDetectors, buildTestHelpers, buildTestSnowplow } from './test';
 
-import { iife } from './iife';
-import { es } from './es';
+export const buildIife = iife;
+export const buildEsm = esm;
+export const buildCjs = cjs;
 
-export const buildSp = iife;
-export const buildEs = es;
-export const build = parallel(iife, es);
-export const testEndToEnd = parallel(pullSnowplowMicro, buildTestDetectors, buildTestHelpers, buildTestSnowplow);
+export const build = parallel(iife, esm, cjs);
+export const buildForIntegrationTest = parallel(pullSnowplowMicro, buildTestDetectors, buildTestHelpers, buildTestSnowplow);
 
 export default build;
