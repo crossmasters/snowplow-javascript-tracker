@@ -70,8 +70,6 @@ export function SharedState() {
   function beforeUnloadHandler() {
     var now;
 
-    console.log('state', mutSnowplowState);
-
     // Flush all POST queues
     forEach(mutSnowplowState.bufferFlushers, function (flusher) {
       flusher();

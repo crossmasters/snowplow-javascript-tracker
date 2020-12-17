@@ -38,15 +38,11 @@
  * Get the name of the global input function
  */
 
-import { SharedState } from './shared_state';
 import { InQueueManager } from './in_queue';
-import { version } from './version';
-import { Tracker } from './tracker';
  
-const state = new SharedState(),
-  windowAlias = window,
-  queueName = windowAlias.GlobalSnowplowNamespace.shift(),
-  queue = windowAlias[queueName];
+const windowAlias = window,
+  functionName = windowAlias.GlobalSnowplowNamespace.shift(),
+  queue = windowAlias[functionName];
 
 // Now replace initialization array with queue manager object
-queue.q = new InQueueManager(Tracker, version, state, queue.q, queueName);
+queue.q = new InQueueManager(functionName, queue.q);

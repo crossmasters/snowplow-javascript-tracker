@@ -38,29 +38,53 @@
  * Get the name of the global input function
  */
 
-import { Tracker } from './tracker'
+import { Tracker } from './tracker';
 import { SharedState } from './shared_state';
 import { version } from './version';
+import { warn } from './lib/helpers';
 
-export const Snowplow = (() => {
-    const trackerDictionary = {};
-    const state = new SharedState();
+const groups = {};
 
-    return {
-        newTracker: (namespace, endpoint, argmap) => {
-            argmap = argmap || {};
+/**
+ * Initiate a new tracker namespace
+ *
+ * @param string namespace
+ * @param string endpoint in the form collector.mysite.com
+ * @param object argmap contains the initialisation options of the JavaScript tracker
+ * @param string trackerGroupName used to group multiple trackers and shared state together
+ */
+export const newTracker = (namespace, endpoint, argmap = {}, trackerGroup = 'snowplow') => {
+  if (!groups.hasOwnProperty(trackerGroup)) {
+    groups[trackerGroup] = { state: new SharedState(), trackers: {} };
+  }
 
-            trackerDictionary[namespace] = new Tracker('snowplow', namespace, version, state, argmap);
-            trackerDictionary[namespace].setCollectorUrl(endpoint);
-            return trackerDictionary[namespace];
-        },
+  const trackerDictionary = groups[trackerGroup].trackers;
+  const state = groups[trackerGroup].state;
 
-        getTracker: (namespace) => {
-            return trackerDictionary[namespace];
-        },
+  if (!trackerDictionary.hasOwnProperty(namespace)) {
+    trackerDictionary[namespace] = new Tracker(trackerGroup, namespace, version, state, argmap);
+    trackerDictionary[namespace].setCollectorUrl(endpoint);
+  } else {
+    warn('Tracker namespace ' + namespace + ' already exists.');
+  }
 
-        allTrackers: () => {
-            return trackerDictionary;
-        }
-    }
-})();
+  return trackerDictionary[namespace];
+};
+
+export const getTracker = (namespace, functionName = 'snowplow') => {
+  if (groups.hasOwnProperty(functionName) && groups[functionName].trackers.hasOwnProperty(namespace)) {
+    return groups[functionName].trackers[namespace];
+  }
+
+  warn('Warning: No tracker configured');
+  return null;
+};
+
+export const allTrackers = (functionName = 'snowplow') => {
+  if (groups.hasOwnProperty(functionName)) {
+    return groups[functionName].trackers;
+  }
+
+  warn('Warning: No trackers configured');
+  return {};
+};
